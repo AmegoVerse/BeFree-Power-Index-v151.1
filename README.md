@@ -1,4 +1,4 @@
-BeFree Power Index v151.1
+# BeFree Power Index v151.1
 
 BeFree Power Index™ (BPI) is a proprietary football analytics system developed by AmegoVerse.
 
@@ -298,11 +298,11 @@ Informal descriptions, conversations, prototypes, or external implementations mu
 12. Current Development Status
 
 Current Build: v151.1
-Current Stage: Foundation
-BPI v1.0: Formula Locked
+Current Stage: Engine Verified & Locked
+BPI v1.0: Formula Locked & Engine Verified (20/20 Regression Passed)
 BPI v2.0: Architecture Defined
-Calculation Engine: Not yet implemented
-Golden Test Case: Not yet implemented
+Calculation Engine: Implemented & Verified (Deterministic, Exit Code 0)
+Golden Test Case: Implemented & Passed (BPI-GOLDEN-001)
 Historical Database: Not yet implemented
 
 ---
