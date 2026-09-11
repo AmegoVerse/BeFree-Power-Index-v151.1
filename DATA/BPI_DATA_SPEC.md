@@ -12,27 +12,36 @@
 
 # 1. PURPOSE
 
-Dokumen ini mendefinisikan standar data yang digunakan oleh BeFree Power Index™.
+BPI DATA SPECIFICATION defines the official data standards used by the BeFree Power Index system.
 
-Tujuan utama:
+The specification establishes:
 
-- Menentukan data apa yang boleh digunakan.
-- Menentukan struktur data yang harus digunakan.
-- Menentukan aturan validasi data.
-- Menjamin konsistensi data antar tim.
-- Menjamin reproducibility hasil BPI.
-- Mencegah penggunaan data yang tidak konsisten.
-- Menjadi dasar untuk Calculation Engine.
-- Menjadi dasar untuk Historical Database.
-- Menjadi dasar untuk Evaluation Engine.
+- Required data inputs
+- Data definitions
+- Data validation
+- Data consistency
+- Data timestamping
+- Data versioning
+- Data traceability
+- Data reproducibility
+- Historical data recording
+- Data quality control
+- Data separation between BPI engine versions
 
-Data Specification ini merupakan bagian dari Source of Truth BeFree Power Index™.
+The purpose is to ensure that every BPI result can be:
+
+- Reproduced
+- Tested
+- Audited
+- Compared
+- Evaluated
+- Traced to its original data source
 
 ---
 
 # 2. DATA PRINCIPLES
 
-Semua data BPI harus memenuhi prinsip berikut:
+All BPI data must follow these principles:
 
 1. Accurate
 2. Complete
@@ -42,19 +51,26 @@ Semua data BPI harus memenuhi prinsip berikut:
 6. Versioned
 7. Reproducible
 
-Data tidak boleh dimanipulasi untuk menghasilkan ranking atau prediksi yang diinginkan.
+Data must represent the actual approved source data.
 
-BPI harus mengikuti data, bukan data mengikuti hasil BPI.
+Data must not be manipulated to produce a preferred BPI result.
+
+Data must not be changed because of:
+
+- Team popularity
+- Personal preference
+- Expected prediction
+- Market opinion
+- Social media sentiment
+- Desired ranking
 
 ---
 
 # 3. DATA SNAPSHOT
 
-BPI menggunakan konsep Data Snapshot.
+Every BPI calculation must be associated with a Data Snapshot.
 
-Satu Data Snapshot adalah kumpulan data yang mewakili kondisi kompetisi pada satu waktu tertentu.
-
-Setiap snapshot wajib memiliki:
+Minimum Snapshot information:
 
 - Snapshot ID
 - Snapshot Date
@@ -62,58 +78,71 @@ Setiap snapshot wajib memiliki:
 - Competition
 - Season
 - Data Source
-- Extraction Time
+- Extraction Timestamp
 - Data Specification Version
 - BPI Engine Version
 - Data Quality Status
 
-Contoh:
+Example:
 
 Snapshot ID:
-`EPL-2026-2027-2026-09-11-001`
+EPL-2026-09-11-001
 
 Competition:
-`English Premier League`
+English Premier League
 
 Season:
-`2026/2027`
+2026/27
 
-Snapshot Date:
-`2026-09-11`
+Snapshot Time:
+2026-09-11 12:00:00 UTC
+
+Data Specification:
+1.0
+
+BPI Engine:
+v1.0
+
+Quality Status:
+VALID
 
 ---
 
 # 4. DATA CONSISTENCY
 
-Semua tim dalam satu perhitungan BPI harus berasal dari snapshot yang sama.
+All teams included in one BPI calculation must use the same approved Data Snapshot.
 
-Tidak diperbolehkan:
+The system must not mix:
 
-- menggunakan data Manchester United dari tanggal A
-- menggunakan data Liverpool dari tanggal B
-- menggunakan data Arsenal dari tanggal C
+- Different dates
+- Different league tables
+- Different seasons
+- Different data sources
+- Different calculation snapshots
 
-untuk menghasilkan satu ranking BPI.
+within the same BPI calculation.
 
-Semua tim harus berasal dari Data Snapshot yang sama.
+Example:
+
+If Team A uses data from 11 September 2026, all other teams in the same calculation must also use the approved 11 September 2026 snapshot.
 
 ---
 
 # 5. BPI v1.0 REQUIRED DATA
 
-BPI v1.0 membutuhkan data berikut:
+BPI v1.0 requires the following raw data:
 
-| Field | Description | Required |
-|---|---|---|
-| Team | Nama tim | YES |
-| Played | Jumlah pertandingan | YES |
-| Wins | Jumlah kemenangan | YES |
-| Draws | Jumlah seri | YES |
-| Losses | Jumlah kekalahan | YES |
-| GF | Goals For | YES |
-| GA | Goals Against | YES |
-| Points | Jumlah poin | YES |
-| Recent Form | Nilai numerik Recent Form | YES |
+1. Team
+2. Played
+3. Wins
+4. Draws
+5. Losses
+6. Goals For
+7. Goals Against
+8. Points
+9. Recent Form
+
+These data fields form the official input layer for BPI v1.0.
 
 ---
 
@@ -121,885 +150,791 @@ BPI v1.0 membutuhkan data berikut:
 
 ## 6.1 Team
 
-Nama resmi tim yang digunakan dalam kompetisi.
+Definition:
 
-Contoh:
+Official team name used by the approved competition data source.
 
-`Manchester United`
+Constraint:
 
-`Liverpool`
-
-`Arsenal`
-
-Team name harus konsisten di seluruh database.
-
-Perubahan nama tim harus dicatat dalam historical data mapping.
+- Must not be empty
+- Must be unique within a snapshot
 
 ---
 
 ## 6.2 Played
 
-Jumlah pertandingan yang telah dimainkan.
+Definition:
 
-Notation:
-
-`P`
+Number of matches played by the team.
 
 Constraint:
 
-`P > 0`
+- Must be greater than 0 for official BPI calculation
+- Must be an integer
 
 ---
 
 ## 6.3 Wins
 
-Jumlah pertandingan yang dimenangkan.
+Definition:
 
-Notation:
-
-`W`
+Number of matches won.
 
 Constraint:
 
-`W >= 0`
+- Must be non-negative
+- Must be an integer
 
 ---
 
 ## 6.4 Draws
 
-Jumlah pertandingan seri.
+Definition:
 
-Notation:
-
-`D`
+Number of matches drawn.
 
 Constraint:
 
-`D >= 0`
+- Must be non-negative
+- Must be an integer
 
 ---
 
 ## 6.5 Losses
 
-Jumlah pertandingan yang kalah.
+Definition:
 
-Notation:
-
-`L`
+Number of matches lost.
 
 Constraint:
 
-`L >= 0`
-
-Relationship:
-
-`W + D + L = P`
+- Must be non-negative
+- Must be an integer
 
 ---
 
-## 6.6 Goals For
+## 6.6 Played Consistency
 
-Jumlah gol yang dicetak tim.
+The following relationship must always be satisfied:
 
-Notation:
+W + D + L = P
 
-`GF`
+Where:
+
+W = Wins  
+D = Draws  
+L = Losses  
+P = Played
+
+If this condition is violated, the dataset is INVALID.
+
+---
+
+## 6.7 Goals For
+
+Definition:
+
+Total goals scored by the team.
 
 Constraint:
 
-`GF >= 0`
+- Must be non-negative
+- Must be an integer
 
 ---
 
-## 6.7 Goals Against
+## 6.8 Goals Against
 
-Jumlah gol yang diterima tim.
+Definition:
 
-Notation:
-
-`GA`
+Total goals conceded by the team.
 
 Constraint:
 
-`GA >= 0`
+- Must be non-negative
+- Must be an integer
 
 ---
 
-## 6.8 Points
+## 6.9 Points
 
-Jumlah poin resmi dalam kompetisi.
+For a standard three-point league system:
 
-Untuk kompetisi dengan sistem standar:
+Points = (3 × Wins) + Draws
 
-`Points = (Wins × 3) + Draws`
+The recorded Points value must be consistent with Wins and Draws.
 
-Data harus diverifikasi terhadap klasemen resmi.
+If the competition uses a different official points system, the system must explicitly identify the competition-specific rule before calculation.
+
+---
+
+## 6.10 Recent Form
+
+Recent Form represents the team's recent performance.
+
+Recent Form contributes 15% to the BPI v1.0 formula.
+
+The exact encoding method is currently:
+
+PENDING FORM ENCODING LOCK
+
+Therefore, no implementation may treat a proposed Recent Form encoding as permanently official until it has been explicitly locked.
 
 ---
 
 # 7. RECENT FORM
 
-Recent Form merupakan salah satu komponen resmi BPI v1.0 dengan bobot:
+Recent Form is an official BPI v1.0 component with a weight of 15%.
 
-`15%`
-
-Namun, metode encoding numerik Recent Form belum dianggap terkunci sampai metode tersebut disetujui secara eksplisit.
+However, the final data encoding method has not yet been permanently locked.
 
 Status:
 
-**PENDING FORM ENCODING LOCK**
+PENDING FORM ENCODING LOCK
 
-Artinya:
+The final encoding must be:
 
-- Recent Form wajib tersedia.
-- Recent Form harus berupa nilai numerik.
-- Encoding harus reproducible.
-- Encoding tidak boleh berubah antar snapshot tanpa versioning.
-- Metode final harus disetujui sebelum Calculation Engine produksi dianggap final.
-
-Tidak boleh membuat metode encoding secara diam-diam.
+- Clearly defined
+- Testable
+- Reproducible
+- Historically applicable
+- Consistent across teams
+- Documented before production implementation
 
 ---
 
 # 8. PROPOSED RECENT FORM ENCODING
 
-Sebagai kandidat untuk pengujian, sistem dapat menggunakan 5 pertandingan terakhir:
+The following method is a proposed candidate only.
 
-Win = 3 poin  
-Draw = 1 poin  
-Loss = 0 poin
+It is NOT currently the final official encoding.
 
-Maximum:
+For the last five matches:
 
-`15`
+Win = 3 points  
+Draw = 1 point  
+Loss = 0 points
 
-Candidate Recent Form:
+Maximum possible points:
 
-`RecentForm = PointsLast5 / 15 × 100`
+15
 
-Contoh:
+Proposed formula:
 
-`W-W-D-L-W`
+RecentForm = (PointsLast5 / 15) × 100
 
-= 3 + 3 + 1 + 0 + 3
+Example:
 
-= 10
+Results:
 
-Recent Form:
+W - W - D - L - W
 
-`10 / 15 × 100 = 66.67`
+Points:
+
+3 + 3 + 1 + 0 + 3 = 10
+
+Proposed Recent Form:
+
+(10 / 15) × 100 = 66.67
 
 IMPORTANT:
 
-Metode ini adalah **PROPOSED METHOD**.
-
-Metode ini belum menjadi bagian formula resmi yang terkunci sampai disetujui dan dimasukkan sebagai encoding resmi.
+This method remains PROPOSED until the Recent Form encoding is explicitly locked.
 
 ---
 
 # 9. DERIVED DATA
 
-Data berikut dihitung oleh Calculation Engine dan bukan input manual utama.
+The following metrics are derived from raw data.
 
 ## 9.1 Points Per Game
 
-`PPG = Points / Played`
+PPG = Points / Played
+
+---
 
 ## 9.2 Goal Difference
 
-`GD = GF - GA`
+GD = Goals For - Goals Against
+
+---
 
 ## 9.3 Goal Difference Per Match
 
-`GD/Match = GD / Played`
+GD/Match = GD / Played
+
+---
 
 ## 9.4 Win Rate
 
-`WinRate = Wins / Played × 100`
+WinRate = (Wins / Played) × 100
+
+---
 
 ## 9.5 Goals For Per Match
 
-`GF/Match = GF / Played`
+GF/Match = Goals For / Played
+
+---
 
 ## 9.6 Goals Against Per Match
 
-`GA/Match = GA / Played`
+GA/Match = Goals Against / Played
+
+---
 
 ## 9.7 Defensive Score
 
-Defensive Score menggunakan GA/Match.
+Lower Goals Against Per Match is better.
 
-Karena nilai GA/Match yang lebih rendah berarti performa defensif yang lebih baik:
+Formula:
 
-`DEF = (GAmax - GAi) / (GAmax - GAmin) × 100`
+DefensiveScore = ((GAmax - GAi) / (GAmax - GAmin)) × 100
 
-Jika:
+Where:
 
-`GAmax = GAmin`
+GAmax = highest GA/Match in the dataset
 
-maka:
+GAmin = lowest GA/Match in the dataset
 
-`DEF = 50`
+GAi = team's GA/Match
 
-untuk seluruh tim.
+If:
+
+GAmax = GAmin
+
+then:
+
+DefensiveScore = 50
+
+for all teams.
 
 ---
 
-# 10. BPI v1.0 INPUT → DERIVED → SCORE FLOW
+# 10. INPUT → DERIVED → SCORE FLOW
 
-```text
+The official data processing flow is:
+
 RAW DATA
-   │
-   ├── Played
-   ├── Wins
-   ├── Draws
-   ├── Losses
-   ├── GF
-   ├── GA
-   ├── Points
-   └── Recent Form
-          │
-          ↓
+
+↓
+
+DATA VALIDATION
+
+↓
+
 DERIVED METRICS
-          │
-          ├── PPG
-          ├── GD/Match
-          ├── Win Rate
-          ├── GF/Match
-          ├── GA/Match
-          └── Defensive Score
-          │
-          ↓
+
+↓
+
 NORMALIZATION
-          │
-          ↓
-BPI v1.0
-          │
-          ↓
-RANKING
 
+↓
 
----
+BPI v1.0 CALCULATION
 
-11. DATA VALIDATION
+↓
 
-Sebelum Calculation Engine dijalankan, data harus melewati validation layer.
+BPI SCORE
 
-Minimum validation:
+↓
 
-V1
+POWER RANKING
 
-Played > 0
+↓
 
-V2
+HISTORICAL RECORD
 
-Wins >= 0
-
-V3
-
-Draws >= 0
-
-V4
-
-Losses >= 0
-
-V5
-
-GF >= 0
-
-V6
-
-GA >= 0
-
-V7
-
-Wins + Draws + Losses = Played
-
-V8
-
-Points >= 0
-
-V9
-
-Untuk sistem 3 poin:
-
-Points = (Wins × 3) + Draws
-
-V10
-
-Team tidak boleh kosong.
-
-V11
-
-Tidak boleh ada duplicate team dalam snapshot yang sama.
-
-V12
-
-Semua tim harus menggunakan snapshot yang sama.
-
+The system must not bypass the validation layer.
 
 ---
 
-12. MISSING DATA
+# 11. DATA VALIDATION
 
-Missing data tidak boleh diganti secara otomatis dengan angka yang dapat memengaruhi hasil BPI.
+Before BPI calculation, the system must validate:
 
-Contoh yang tidak diperbolehkan:
+1. Played > 0
+2. Wins >= 0
+3. Draws >= 0
+4. Losses >= 0
+5. Goals For >= 0
+6. Goals Against >= 0
+7. Wins + Draws + Losses = Played
+8. Points >= 0
+9. Points are consistent with the official competition points system
+10. Team name is not empty
+11. Team name is unique within the snapshot
+12. All teams use the same approved snapshot
+13. Required data fields are present
+14. No division by zero is possible
 
-GA = NULL → GA = 0
-
-atau:
-
-Recent Form = NULL → Recent Form = 50
-
-kecuali aturan tersebut secara eksplisit ditetapkan dalam data policy.
-
-Jika data wajib hilang:
-
-DATA STATUS = INVALID
-
-Calculation Engine tidak boleh menghasilkan official BPI dari data yang invalid.
-
-
----
-
-13. DUPLICATE DATA
-
-Satu tim hanya boleh muncul satu kali dalam satu snapshot.
-
-Contoh invalid:
-
-Manchester United
-Manchester United
-Liverpool
-Arsenal
-
-Duplicate record harus diperbaiki sebelum calculation.
-
+If a required validation fails, the dataset must not be used for an official BPI result.
 
 ---
 
-14. DATA SOURCE
+# 12. MISSING DATA
 
-Data source harus dicatat.
+Required data must not be silently estimated.
 
-Contoh:
+If a required field is missing:
 
-Official Competition Data
+DATA QUALITY STATUS = INVALID
 
-Official League Table
+The system must not automatically:
 
-Approved Statistical Provider
+- Guess the value
+- Copy another team's value
+- Use an outdated value without documentation
+- Replace the value with zero
+- Use an AI-generated estimate
 
-Approved Data API
-
-
-Setiap dataset harus memiliki:
-
-Source Name
-
-Source Reference
-
-Extraction Timestamp
-
-Data source dapat berubah, tetapi perubahan source harus dicatat dalam historical record.
-
+Any approved exception must be explicitly documented.
 
 ---
 
-15. DATA TIMESTAMP
+# 13. DUPLICATE DATA
 
-Setiap snapshot wajib memiliki timestamp.
+A team must appear only once within the same Data Snapshot.
 
-Minimum:
+Duplicate team records are invalid unless they represent explicitly different entities according to the competition's official data structure.
+
+If duplicate records exist:
+
+DATA QUALITY STATUS = INVALID
+
+The dataset must be corrected before official BPI calculation.
+
+---
+
+# 14. DATA SOURCE
+
+Every official dataset must identify its source.
+
+Minimum source information:
+
+- Source Name
+- Source Reference
+- Extraction Date
+- Extraction Time
+- Extraction Timestamp
+- Relevant Competition
+- Relevant Season
+
+The source must be traceable.
+
+---
+
+# 15. DATA TIMESTAMP
+
+All official data extraction timestamps should use:
 
 YYYY-MM-DD HH:MM:SS UTC
 
-Contoh:
+Example:
 
 2026-09-11 12:00:00 UTC
 
-Timestamp digunakan untuk:
-
-historical comparison
-
-BPI Change
-
-reproducibility
-
-evaluation
-
-audit
-
-
+The timestamp identifies the exact point at which the approved dataset was collected.
 
 ---
 
-16. DATA VERSIONING
+# 16. DATA VERSIONING
 
-Data Specification memiliki version.
-
-Contoh:
+Current Data Specification Version:
 
 DATA_SPEC_VERSION = 1.0
 
-Perubahan struktur data harus meningkatkan versi data specification jika perubahan tersebut dapat memengaruhi calculation.
+A material structural change to the data specification requires a new specification version.
 
-Perubahan kecil yang tidak memengaruhi calculation dapat dicatat dalam CHANGELOG.
+Examples of material changes:
 
+- New mandatory data field
+- Removal of a mandatory data field
+- Change to field meaning
+- Change to validation rules
+- Change to data architecture
 
----
-
-17. BPI ENGINE VERSION
-
-Setiap hasil BPI harus menyimpan engine version.
-
-Contoh:
-
-BPI_ENGINE = v1.0
-
-Data yang sama harus menghasilkan hasil yang sama apabila:
-
-data snapshot sama
-
-data specification sama
-
-engine version sama
-
-formula sama
-
-
+Minor documentation corrections that do not change data behavior may be recorded without changing the specification version, subject to project governance.
 
 ---
 
-18. HISTORICAL DATA RECORD
+# 17. BPI ENGINE VERSION
 
-Historical record minimal menyimpan:
+Every official BPI result must store the BPI Engine Version used to produce it.
 
-Snapshot ID
-Snapshot Date
-Competition
-Season
-Team
-Played
-Wins
-Draws
-Losses
-GF
-GA
-Points
-Recent Form
-PPG
-GD
-GD/Match
-Win Rate
-GF/Match
-GA/Match
-Defensive Score
-BPI Score
-Power Ranking
-BPI Engine Version
-Data Specification Version
-Data Source
+Example:
 
-Historical data tidak boleh ditimpa.
+BPI_ENGINE_VERSION = v1.0
 
-Jika terjadi koreksi data, record lama harus tetap dapat ditelusuri.
+The system must preserve the relationship between:
 
+- Data Snapshot
+- Data Specification Version
+- BPI Engine Version
+- Formula Version
+
+Same approved data + same specification + same engine version + same formula must produce the same BPI result.
 
 ---
 
-19. DATA IMMUTABILITY
+# 18. HISTORICAL DATA RECORD
 
-Historical BPI result harus diperlakukan sebagai immutable record.
+Every official historical BPI record should preserve:
 
-Artinya:
+- Snapshot ID
+- Snapshot Date
+- Competition
+- Season
+- Team
+- Played
+- Wins
+- Draws
+- Losses
+- Goals For
+- Goals Against
+- Points
+- Recent Form
+- Derived Metrics
+- Normalized Scores
+- BPI Score
+- Power Ranking
+- BPI Engine Version
+- Data Specification Version
+- Data Source
 
-Data historis yang telah digunakan untuk menghasilkan official BPI tidak boleh diubah tanpa audit trail.
-
-Jika data sumber kemudian dikoreksi:
-
-1. Record lama dipertahankan.
-
-
-2. Koreksi dicatat.
-
-
-3. Snapshot baru dibuat.
-
-
-4. BPI dihitung ulang dengan snapshot baru.
-
-
-5. Perubahan dicatat dalam history.
-
-
-
+Historical records must be sufficient to reproduce the calculation.
 
 ---
 
-20. BPI v2.0 DATA
+# 19. DATA IMMUTABILITY
 
-BPI v2.0 membutuhkan data tambahan karena berfungsi sebagai Match Engine.
+Historical BPI records should not be silently overwritten.
 
-Planned data:
+If an error is discovered:
 
-Match Data
+1. Preserve the original record.
+2. Identify the error.
+3. Create a corrected Data Snapshot.
+4. Record the correction.
+5. Preserve an audit trail.
+6. Recalculate only under the appropriate version and snapshot.
 
-Match ID
-
-Date
-
-Competition
-
-Season
-
-Home Team
-
-Away Team
-
-Venue
-
-
-Recent Performance
-
-Recent matches
-
-Recent results
-
-Recent goals
-
-Recent opponent strength
-
-
-Home/Away
-
-Home performance
-
-Away performance
-
-Home goals
-
-Away goals
-
-
-Opponent Strength
-
-Previous opponents
-
-Opponent BPI
-
-Opponent ranking
-
-Strength-adjusted results
-
-
-Squad
-
-Starting XI
-
-Player availability
-
-Injuries
-
-Suspensions
-
-Bench strength
-
-
-Momentum
-
-Recent performance trend
-
-Result sequence
-
-Performance direction
-
-
-Goal Timing
-
-Goals scored by time interval
-
-Goals conceded by time interval
-
-Goal timing matchup
-
-
-BPI v2.0 data structure akan dikembangkan lebih lanjut setelah BPI v1.0 data layer dan testing selesai.
-
+This prevents historical results from being silently rewritten.
 
 ---
 
-21. DATA SEPARATION
+# 20. BPI v2.0 DATA
 
-BPI v1.0 dan BPI v2.0 harus memiliki separation yang jelas.
+BPI v2.0 is designed as a Match Engine.
+
+Potential match-level data includes:
+
+- Match ID
+- Match Date
+- Competition
+- Season
+- Home Team
+- Away Team
+- Venue
+- Recent Performance
+- Home Form
+- Away Form
+- Opponent Strength
+- Starting XI Strength
+- Injury Status
+- Suspension Status
+- Bench Strength
+- Momentum
+- Goal Timing Profile
+- Matchup Information
+
+BPI v2.0 data requirements may expand during development.
+
+The final mathematical model is NOT YET LOCKED.
+
+---
+
+# 21. DATA SEPARATION
+
+BPI v1.0 and BPI v2.0 have different purposes.
 
 BPI v1.0:
 
-League / Competition Strength
+League / competition power ranking.
 
 BPI v2.0:
 
-Specific Match Evaluation
+Specific match evaluation.
 
-Data tambahan BPI v2.0 tidak boleh dimasukkan ke dalam BPI v1.0 secara diam-diam.
+Match-specific information must not silently enter BPI v1.0.
 
+BPI v1.0 historical results must remain reproducible independently of BPI v2.0.
 
 ---
 
-22. DATA QUALITY STATUS
+# 22. DATA QUALITY STATUS
 
-Setiap snapshot dapat memiliki status:
+Each dataset must have a quality status.
+
+Allowed statuses:
 
 VALID
 
-Data memenuhi seluruh validation rule.
+The dataset passed all required validation rules.
 
 WARNING
 
-Data dapat digunakan tetapi terdapat issue yang tidak mengubah calculation secara langsung.
+The dataset contains a documented issue that does not necessarily invalidate the intended calculation.
 
 INVALID
 
-Data tidak memenuhi syarat calculation.
+The dataset fails one or more mandatory validation requirements.
 
-Official BPI hanya boleh dihitung dari:
-
-VALID
-
-kecuali terdapat keputusan khusus yang terdokumentasi.
-
+Official BPI production results should normally be generated only from VALID data.
 
 ---
 
-23. DATA AUDIT
+# 23. DATA AUDIT
 
-Setiap official BPI calculation harus dapat ditelusuri kembali ke:
+The complete data audit chain should be traceable through:
 
-Data Source
-      ↓
-Snapshot
-      ↓
-Raw Data
-      ↓
-Derived Metrics
-      ↓
-Normalization
-      ↓
-BPI Calculation
-      ↓
-Ranking
+SOURCE
 
-Tujuannya adalah agar setiap angka BPI dapat diaudit.
+↓
 
+SNAPSHOT
 
----
+↓
 
-24. REPRODUCIBILITY
+RAW DATA
 
-Sistem harus memenuhi prinsip:
+↓
 
-Same Data
-+
-Same Specification
-+
-Same Engine Version
-+
-Same Formula
-=
-Same BPI Result
+VALIDATION
 
-Perbedaan hasil harus dapat dijelaskan oleh:
+↓
 
-perubahan data
+DERIVED METRICS
 
-perubahan specification
+↓
 
-perubahan engine version
+NORMALIZATION
 
-perubahan formula resmi
+↓
 
+BPI CALCULATION
 
-Tidak boleh terjadi perubahan hasil tanpa alasan yang dapat ditelusuri.
+↓
 
+BPI SCORE
+
+↓
+
+POWER RANKING
+
+↓
+
+HISTORICAL RECORD
+
+An auditor should be able to trace a BPI result back to its source data.
 
 ---
 
-25. DATA SECURITY AND INTEGRITY
+# 24. REPRODUCIBILITY
 
-Data tidak boleh dimanipulasi untuk:
+Official reproducibility principle:
 
-menaikkan ranking tim tertentu
+Same Data + Same Specification + Same Engine Version + Same Formula = Same BPI Result
 
-menurunkan ranking tim tertentu
+This principle is mandatory for the BPI system.
 
-menghasilkan prediction tertentu
+A different result must be explainable by a documented difference in:
 
-menyesuaikan hasil dengan opini
-
-menyesuaikan hasil dengan popularitas klub
-
-
-BPI harus tetap data-driven.
-
+- Data
+- Specification
+- Engine Version
+- Formula
+- Calculation procedure
 
 ---
 
-26. GOLDEN TEST REQUIREMENT
+# 25. DATA SECURITY AND INTEGRITY
 
-Data Specification menjadi salah satu dasar untuk Golden Test Case.
+BPI data must not be manipulated to produce a preferred result.
 
-Golden Test harus menggunakan dataset yang:
+The system must remain independent from:
 
-lengkap
+- Team preference
+- Fan preference
+- Social media popularity
+- Betting preference
+- Personal opinion
+- Commercial interest
+- Expected outcome
 
-valid
-
-deterministic
-
-terdokumentasi
-
-dapat dihitung ulang
-
-
-Golden Test harus menghasilkan output yang sama selama specification dan engine tidak berubah.
-
+The data layer exists to provide objective inputs to the BPI engine.
 
 ---
 
-27. CHANGE GOVERNANCE
+# 26. GOLDEN TEST REQUIREMENT
 
-Perubahan pada data specification harus diklasifikasikan.
+Before production implementation, the BPI system must have at least one Golden Test Case.
 
-MINOR CHANGE
+The Golden Test Case must contain:
 
-Tidak mengubah hasil BPI.
+- Complete input data
+- Valid data structure
+- Defined Data Snapshot
+- Defined Data Specification Version
+- Defined BPI Engine Version
+- Expected derived metrics
+- Expected normalized scores
+- Expected BPI scores
+- Expected ranking
+- Expected Power Gap where applicable
 
-Contoh:
+The Golden Test must be:
 
-penambahan dokumentasi
+- Deterministic
+- Repeatable
+- Documented
+- Reproducible
 
-perbaikan typo
-
-penjelasan field
-
-
-MATERIAL CHANGE
-
-Berpotensi mengubah hasil BPI.
-
-Contoh:
-
-perubahan Recent Form encoding
-
-perubahan normalization
-
-perubahan required input
-
-perubahan data treatment
-
-
-Material change harus:
-
-1. didokumentasikan
-
-
-2. diuji
-
-
-3. dievaluasi
-
-
-4. dicatat di CHANGELOG
-
-
-5. mendapatkan versioning yang sesuai
-
-
-
+If the specification and engine remain unchanged, the expected result must remain unchanged.
 
 ---
 
-28. SOURCE OF TRUTH
+# 27. CHANGE GOVERNANCE
 
-Urutan authority:
+Changes to the data layer must be classified.
+
+## Minor Change
+
+Examples:
+
+- Typographical correction
+- Documentation clarification
+- Non-functional formatting correction
+
+Minor changes may not require a new engine version if calculation behavior remains unchanged.
+
+## Material Change
+
+Examples:
+
+- New mandatory data field
+- Changed data definition
+- Changed validation rule
+- Changed calculation input
+- Changed formula-related data behavior
+
+Material changes must be:
+
+1. Documented
+2. Tested
+3. Evaluated
+4. Recorded in CHANGELOG.md
+5. Assigned the appropriate version
+
+No material change may be silently introduced.
+
+---
+
+# 28. SOURCE OF TRUTH
+
+The BPI project documentation hierarchy is:
 
 BPI_MASTER_SPEC.md
-        ↓
+
+↓
+
 BPI_v1.0.md / BPI_v2.0.md
-        ↓
+
+↓
+
 BPI_DATA_SPEC.md
-        ↓
+
+↓
+
 TEST CASES
-        ↓
+
+↓
+
 IMPLEMENTATION
 
-Jika implementation berbeda dengan specification, implementation harus diperbaiki.
+The implementation must follow the approved specifications.
 
-Bukan specification yang disesuaikan secara diam-diam untuk mengikuti implementation.
-
+If implementation conflicts with the specification, the specification must be reviewed before changing the formula or behavior.
 
 ---
 
-29. CURRENT STATUS
+# 29. CURRENT STATUS
 
-BPI v1.0:
+Current BPI Data Layer status:
 
-FORMULA LOCKED
+BPI v1.0 Formula:
+LOCKED
 
-Data Layer:
+BPI v1.0 Data Structure:
+DEFINED
 
-SPECIFICATION DEFINED
+BPI v1.0 Required Data:
+DEFINED
+
+Data Validation:
+DEFINED
+
+Data Snapshot:
+DEFINED
+
+Historical Data Structure:
+DEFINED
+
+Data Audit:
+DEFINED
+
+Data Reproducibility:
+DEFINED
 
 Recent Form Encoding:
+PENDING FORM ENCODING LOCK
 
-PENDING EXPLICIT LOCK
+BPI v2.0 Data Architecture:
+DEFINED
 
-BPI v2.0 Data:
-
-ARCHITECTURE DEFINED / EXPANSION PENDING
+BPI v2.0 Final Formula:
+NOT YET LOCKED
 
 Calculation Engine:
-
 NOT YET IMPLEMENTED
 
 Golden Test:
-
 NOT YET IMPLEMENTED
 
 Evaluation Engine:
-
 NOT YET IMPLEMENTED
 
+---
+
+# 30. OFFICIAL PRINCIPLE
+
+The BeFree Power Index data layer must ensure that every BPI result is:
+
+- Traceable
+- Testable
+- Repeatable
+- Comparable
+- Auditable
+- Evaluatable
+- Reproducible
+- Developable without breaking historical versions
+
+The BPI system is proprietary.
+
+All methodology, specifications, formulas, data structures, testing procedures, source code, evaluation methods, historical records, and documentation are proprietary to the BeFree Power Index project.
+
+No open-source license is granted unless explicitly authorized by the project owner.
 
 ---
 
-30. OFFICIAL PRINCIPLE
-
-BeFree Power Index™ tidak boleh menjadi sistem yang hanya menghasilkan angka.
-
-BPI harus menjadi sistem yang:
-
-dapat ditelusuri
-
-dapat diuji
-
-dapat diulang
-
-dapat dibandingkan
-
-dapat dievaluasi
-
-dapat dikembangkan tanpa merusak versi sebelumnya
-
-
-Data adalah fondasi dari seluruh sistem.
-
-
----
-
-BeFree Power Index™ v151.1
-
-Proprietary System
-
-All Rights Reserved
+# END OF BPI DATA SPECIFICATION
