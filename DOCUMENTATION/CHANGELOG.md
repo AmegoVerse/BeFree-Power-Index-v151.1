@@ -14,3 +14,9 @@ All notable changes to the BeFree Power Index project will be documented in this
 
 ### Verified & Locked
 - **BPI v1.0 Calculation Engine:** Officially declared **VERIFIED & LOCKED** after achieving 20/20 PASS results (exit code 0) on runtime regression execution.
+- **Golden Test Case #001:** Validated calculation consistency against the synthetic reference dataset without deviation.
+
+### Core Guarantees Maintained
+- **Formula Integrity:** BPI v1.0 formula components and component weights remain strictly locked (PPG 30%, GD/Match 20%, Win Rate 20%, Recent Form 15%, GF/Match 10%, Defensive Score 5%).
+- **Determinism:** Enforced strict floating-point handling, sequential ranking, alphabetical tie-breaking, and exact 4-decimal-place rounding.
+- **Defensive Validation:** Enforced hard-fail constraints on schema mismatches, non-integer inputs (including rejecting float integers like `10.0`), null/NaN/Infinity values, and mathematical inconsistencies (such as `W+D+L != P`).
