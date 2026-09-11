@@ -22,6 +22,65 @@ This engine must strictly implement BPI v1.0 components. It must NOT include any
 ---
 
 ## 3. INPUT DATA CONTRACT
+The engine must accept a tabular data structure representing the league table.
+
+### 3.1 Mandatory Fields
+Every team record must contain exactly these fields:
+*   `team_name` (String)
+*   `matches_played` (Integer)
+*   `wins` (Integer)
+*   `draws` (Integer)
+*   `losses` (Integer)
+*   `goals_for` (Integer)
+*   `goals_against` (Integer)
+*   `points` (Integer)
+*   `recent_form_score` (Numeric Scalar)
+
+---
+
+## 4. VALIDATION & PROTECTION
+
+### 4.1 Dataset-Level Validation (Hard Fail conditions)
+The engine must reject the entire dataset and raise an Exception if ANY of these conditions are met:
+*   Dataset is empty.
+*   Any mandatory field is missing or extra fields exist.
+*   `team_name` is empty, whitespace-only, duplicated, or non-string.
+*   Any numeric field contains NaN, Null, or Infinity.
+*   `matches_played`, `wins`, `draws`, `losses`, `goals_for`, `goals_against`, `points` contain non-integer values (including floating-point integers like `10.0`) or negative values.
+*   `matches_played` is 0 (ZeroDivision protection).
+
+### 4.2 Calculation-Level Validation (Hard Fail conditions)
+*   `wins + draws + losses != matches_played`
+*   `(wins * 3) + (draws * 1) != points`
+
+---
+
+## 5. MATHEMATICAL CALCULATION RULES
+
+### 5.1 Precision and Rounding Flow
+1.  **Raw Calculation:** Calculate derived metrics and normalized scores using standard double-precision floating point. Do NOT round intermediate results.
+2.  **BPI Calculation:** Calculate the `unrounded_BPI_score` (weighted sum).
+3.  **Ranking:** Sort based on the `unrounded_BPI_score` descending, tie-broken by `team_name` ascending alphabetically.
+4.  **Power Gap:** Calculate Power Gap using the `unrounded_BPI_score`.
+5.  **Final Rounding:** Round the final `bpi_score` and `power_gap` to exactly 4 decimal places ONLY before the final output.
+
+### 5.2 Zero Range Normalization
+If the maximum and minimum values for any metric across the dataset are identical (`x_max == x_min`), the normalized score for that specific metric for all teams must be exactly `50.0000`.
+
+---
+
+## 6. POWER GAP DEFINITION
+*   For any team at rank $r$ where $r < N$: 
+    $$\text{PowerGap}_r = \text{unrounded\_BPI}_r - \text{unrounded\_BPI}_{r+1}$$
+*   For the team at the lowest rank ($r = N$): 
+    $$\text{PowerGap}_N = 0.0000$$
+
+---
+
+## 7. GOLDEN TEST INTEGRATION
+The engine file must include a callable function (`test_bpi_golden_001()`) that validates the engine's output against the `BPI-GOLDEN-001` snapshot data.
+
+## 3. INPUT DATA CONTRACT
 The engine must accept a tabular data structure (e.g., list of dictionaries or pandas DataFrame) representing the league table.
 
 ### 3.1 Mandatory Fields
